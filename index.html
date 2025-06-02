@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Masmarulez</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: #fff;
+    }
+
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: auto;
+    }
+
+    .video-box {
+      position: relative;
+      width: 100%;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .video-box iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 모바일: 9:16 비율 유지 */
+    @media (max-width: 767px) {
+      img {
+        max-width: 100%;
+      }
+
+      .video-box {
+        max-width: 100%;
+        padding-top: 177.78%;
+      }
+    }
+
+    /* PC: 적절한 세로 제한 + 비율 유지 */
+    @media (min-width: 768px) {
+      img {
+        max-width: 900px;
+      }
+
+      .video-box {
+        width: 100%;
+        max-width: 540px; /* 9:16 기준 */
+        aspect-ratio: 9 / 16;
+        height: auto;
+        max-height: 90vh; /* 화면보다 너무 길지 않도록 제한 */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <img src="https://gi.esmplus.com/pipe0801/MASMARULEZ/common/all-noti.jpg" />
+  <img src="https://gi.esmplus.com/pipe0801/MASMARULEZ/common/hp-all-top.jpg" />
+
+  <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test01.jpg" />
+
+  <!-- ✅ 유튜브 영상 (9:16 비율, PC에선 max-height 제한) -->
+  <div class="video-box">
+    <iframe
+      src="https://www.youtube.com/embed/GocUscytFQ8?autoplay=1&mute=1&loop=1&playlist=GocUscytFQ8&controls=0&modestbranding=1&rel=0"
+      frameborder="0"
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test02.jpg" />
+  <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test03.jpg" />
+  <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test04.jpg" />
+  <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test05.jpg" />
+  <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test06.jpg" />
+  <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test07.gif" />
+  <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test08.jpg" />
+  <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test09.jpg" />
+
+  <img src="https://gi.esmplus.com/pipe0801/MASMARULEZ/common/c-bottom.jpg" />
+
+</body>
+</html>
