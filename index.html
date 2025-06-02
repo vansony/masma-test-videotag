@@ -22,19 +22,20 @@
     .video-box {
       position: relative;
       width: 100%;
-      margin: 0 auto;
+      margin: auto;
       overflow: hidden;
     }
 
-    .video-box iframe {
+    .video-box video {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      object-fit: cover;
     }
 
-    /* 모바일: 9:16 비율 유지 */
+    /* 모바일: 세로 9:16 */
     @media (max-width: 767px) {
       img {
         max-width: 100%;
@@ -42,11 +43,11 @@
 
       .video-box {
         max-width: 100%;
-        padding-top: 177.78%;
+        padding-top: 177.78%; /* 9:16 */
       }
     }
 
-    /* PC: 적절한 세로 제한 + 비율 유지 */
+    /* PC: 세로 비율 유지 + 최대 높이 제한 */
     @media (min-width: 768px) {
       img {
         max-width: 900px;
@@ -54,10 +55,9 @@
 
       .video-box {
         width: 100%;
-        max-width: 540px; /* 9:16 기준 */
+        max-width: 540px;       /* 적절한 세로비 영상 너비 */
         aspect-ratio: 9 / 16;
-        height: auto;
-        max-height: 90vh; /* 화면보다 너무 길지 않도록 제한 */
+        max-height: 90vh;       /* 너무 길지 않도록 */
       }
     }
   </style>
@@ -69,14 +69,12 @@
 
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test01.jpg" />
 
-  <!-- ✅ 유튜브 영상 (9:16 비율, PC에선 max-height 제한) -->
+  <!-- ✅ video 태그로 직접 재생 -->
   <div class="video-box">
-    <iframe
-      src="https://www.youtube.com/embed/GocUscytFQ8?autoplay=1&mute=1&loop=1&playlist=GocUscytFQ8&controls=0&modestbranding=1&rel=0"
-      frameborder="0"
-      allow="autoplay; fullscreen; picture-in-picture"
-      allowfullscreen
-    ></iframe>
+    <video autoplay muted loop playsinline>
+      <source src="https://cdn2.auchee.com/video/250526_rabbitecobag_airydot.mp4" type="video/mp4" />
+      브라우저가 video 태그를 지원하지 않습니다.
+    </video>
   </div>
 
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test02.jpg" />
