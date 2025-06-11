@@ -66,6 +66,73 @@
 
   <img src="https://gi.esmplus.com/pipe0801/MASMARULEZ/common/all-noti.jpg" />
   <img src="https://gi.esmplus.com/pipe0801/MASMARULEZ/common/hp-all-top.jpg" />
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>360도 가방 회전</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      height: 100%;
+    }
+
+    #bag-wrapper {
+      width: 100vw;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #ffffff;
+    }
+
+    #bag360 {
+      width: 100vw;
+      aspect-ratio: 800 / 1138;
+      max-height: 95vh;
+      background-color: transparent;
+      touch-action: pan-y;
+      will-change: transform;
+    }
+  </style>
+</head>
+<body>
+
+<div id="bag-wrapper">
+  <div id="bag360">로딩 중...</div>
+</div>
+
+<script>
+  const imageUrls = [];
+  for (let i = 1; i <= 37; i++) {
+    imageUrls.push(`https://enj161203.diskn.com/product/tshirts_test/test/레이어 ${i}.JPG`);
+  }
+
+  const containerWidth = document.getElementById('bag360').clientWidth;
+  const bagRatio = 1138 / 800;
+  const containerHeight = containerWidth * bagRatio;
+
+  $('#bag360').spritespin({
+    source: imageUrls,
+    width: containerWidth,
+    height: containerHeight,
+    responsive: false,
+    animate: true,             // 🔥 자동 회전 on
+    loop: true,                // 🔁 반복 회전
+    frameTime: 100,            // ⏱ 속도 조절 (ms/프레임) → 100~150 추천
+    sense: -1,                 // 방향 반전 (원하는 방향 반대로면 +1로 바꿔도 됨)
+    plugins: ['360', 'drag'],
+    dragAxis: 'x'              // 스와이프는 여전히 가능
+  });
+</script>
+
+</body>
+</html>
 
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test01.jpg" />
 
