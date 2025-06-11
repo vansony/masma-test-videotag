@@ -117,27 +117,32 @@
   const bagRatio = 1138 / 800;
   const containerHeight = containerWidth * bagRatio;
 
-  const spin = $('#bag360').spritespin({
+  let spinApi;
+
+  $('#bag360').spritespin({
     source: imageUrls,
     width: containerWidth,
     height: containerHeight,
     responsive: false,
-    animate: true,             // ✅ 자동 회전 ON
+    animate: true,             // 자동 회전 on
     loop: true,
-    frameTime: 125,            // ✅ 느긋하게 회전
+    frameTime: 125,            // 천천히
     sense: -1,
     plugins: ['360', 'drag'],
     dragAxis: 'x',
-
+    onInit: function(e, data) {
+      spinApi = data.api; // API 저장
+    },
     onDragStart: function(e, data) {
-      data.api.stopAnimation(); // ✋ 드래그 시작 시 자동회전 일시정지
+      spinApi.stopAnimation(); // 드래그 시 정지
     },
     onDragEnd: function(e, data) {
       setTimeout(() => {
-        data.api.startAnimation(); // 👆 드래그 끝나면 자동회전 재시작
-      }, 300); // 약간의 딜레이 후 부드럽게 재시작
+        spinApi.animate = true;         // 수동으로 재설정
+        spinApi.startAnimation();       // 재시작 명령
+      }, 300); // 0.3초 후 다시 회전 시작
     }
-  }).spritespin('api');
+  });
 </script>
 
 </body>
