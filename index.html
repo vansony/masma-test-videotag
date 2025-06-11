@@ -117,22 +117,32 @@
   const bagRatio = 1138 / 800;
   const containerHeight = containerWidth * bagRatio;
 
-  $('#bag360').spritespin({
+  const spin = $('#bag360').spritespin({
     source: imageUrls,
     width: containerWidth,
     height: containerHeight,
     responsive: false,
-    animate: true,             // 🔥 자동 회전 on
-    loop: true,                // 🔁 반복 회전
-    frameTime: 100,            // ⏱ 속도 조절 (ms/프레임) → 100~150 추천
-    sense: -1,                 // 방향 반전 (원하는 방향 반대로면 +1로 바꿔도 됨)
+    animate: true,             // ✅ 자동 회전 ON
+    loop: true,
+    frameTime: 125,            // ✅ 느긋하게 회전
+    sense: -1,
     plugins: ['360', 'drag'],
-    dragAxis: 'x'              // 스와이프는 여전히 가능
-  });
+    dragAxis: 'x',
+
+    onDragStart: function(e, data) {
+      data.api.stopAnimation(); // ✋ 드래그 시작 시 자동회전 일시정지
+    },
+    onDragEnd: function(e, data) {
+      setTimeout(() => {
+        data.api.startAnimation(); // 👆 드래그 끝나면 자동회전 재시작
+      }, 300); // 약간의 딜레이 후 부드럽게 재시작
+    }
+  }).spritespin('api');
 </script>
 
 </body>
 </html>
+
 
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test01.jpg" />
 
