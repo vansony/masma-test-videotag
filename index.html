@@ -123,7 +123,8 @@
   let isDragging = false;
   let startX = 0;
   let lastX = 0;
-  let frameOffset = 0;
+  let accumulatedDelta = 0;
+  const sensitivity = 0.15; // 낮을수록 더 민감하고 부드러움
 
   function getImageSrc(index) {
     return `${baseUrl}레이어 ${index + 1}.JPG`;
@@ -152,27 +153,25 @@
       stopAutoRotate();
       startX = e.touches[0].clientX;
       lastX = startX;
+      accumulatedDelta = 0;
     });
 
     el.addEventListener('touchmove', (e) => {
       if (!isDragging) return;
       const currentX = e.touches[0].clientX;
       const dx = currentX - lastX;
-      const sensitivity = 0.25;
-      if (Math.abs(dx) > 1) {
-        frameOffset += dx;
-        const offsetFrames = Math.floor(frameOffset * sensitivity);
-        if (offsetFrames !== 0) {
-          updateFrame(currentFrame - offsetFrames);
-          frameOffset = 0;
-        }
-        lastX = currentX;
+      accumulatedDelta += dx;
+      const frameChange = Math.floor(accumulatedDelta * sensitivity);
+      if (frameChange !== 0) {
+        updateFrame(currentFrame - frameChange);
+        accumulatedDelta -= frameChange / sensitivity; // 남은 델타 유지
       }
+      lastX = currentX;
     });
 
     el.addEventListener('touchend', () => {
       isDragging = false;
-      frameOffset = 0;
+      accumulatedDelta = 0;
       setTimeout(() => {
         if (!isDragging) startAutoRotate();
       }, 300);
