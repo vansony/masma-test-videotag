@@ -114,7 +114,7 @@
   let autoplayInterval;
   let isDragging = false;
   let startX = 0;
-  let lastFrameChangeX = 0;
+  let lastX = 0;
 
   function getImageSrc(index) {
     return `${baseUrl}레이어 ${index + 1}.JPG`;
@@ -138,25 +138,21 @@
     clearInterval(autoplayInterval);
   }
 
-  // 드래그 제어 개선
+  // 드래그 제어 개선 - 속도에 따라 부드럽게 반응
   frame.addEventListener('touchstart', (e) => {
     isDragging = true;
     startX = e.touches[0].clientX;
-    lastFrameChangeX = startX;
+    lastX = startX;
     stopAutoplay();
   });
 
   frame.addEventListener('touchmove', (e) => {
     if (!isDragging) return;
-    const x = e.touches[0].clientX;
-    const dx = x - lastFrameChangeX;
-    const threshold = 5; // 더 민감하게 반응
-
-    if (Math.abs(dx) >= threshold) {
-      const frameStep = Math.floor(dx / threshold);
-      updateFrame(current - frameStep);
-      lastFrameChangeX = x;
-    }
+    const currentX = e.touches[0].clientX;
+    const dx = currentX - lastX;
+    const sensitivity = 0.25; // 감도 조절 (작을수록 민감)
+    updateFrame(current - dx * sensitivity);
+    lastX = currentX;
   });
 
   frame.addEventListener('touchend', () => {
@@ -173,7 +169,6 @@
 
 </body>
 </html>
-
 
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test01.jpg" />
 
