@@ -110,11 +110,10 @@
   const baseUrl = 'https://enj161203.diskn.com/product/tshirts_test/test/';
 
   let current = 0;
-  let autoplay = true;
   let autoplayInterval;
   let isDragging = false;
-  let startX = 0;
-  let lastX = 0;
+  let dragStartX = 0;
+  let dragLastX = 0;
 
   function getImageSrc(index) {
     return `${baseUrl}레이어 ${index + 1}.JPG`;
@@ -126,36 +125,35 @@
   }
 
   function startAutoplay() {
-    if (autoplayInterval) clearInterval(autoplayInterval);
-    autoplay = true;
+    clearInterval(autoplayInterval);
     autoplayInterval = setInterval(() => {
       updateFrame(current + 1);
     }, 125);
   }
 
   function stopAutoplay() {
-    autoplay = false;
     clearInterval(autoplayInterval);
   }
 
-  // 드래그 제어 개선 - 속도에 따라 부드럽게 반응
+  // 스와이프 시작
   frame.addEventListener('touchstart', (e) => {
     isDragging = true;
-    startX = e.touches[0].clientX;
-    lastX = startX;
+    dragStartX = dragLastX = e.touches[0].clientX;
     stopAutoplay();
   });
 
+  // 스와이프 중 - 부드럽게 이동
   frame.addEventListener('touchmove', (e) => {
     if (!isDragging) return;
     const currentX = e.touches[0].clientX;
-    const dx = currentX - lastX;
-    const sensitivity = 0.25; // 감도 조절 (작을수록 민감)
-    const targetFrame = Math.round(current - dx * sensitivity);
-    updateFrame(targetFrame);
-    lastX = currentX;
+    const dx = currentX - dragLastX;
+    const sensitivity = 0.2;
+    current -= dx * sensitivity;
+    updateFrame(current);
+    dragLastX = currentX;
   });
 
+  // 스와이프 끝나면 다시 자동 회전
   frame.addEventListener('touchend', () => {
     isDragging = false;
     setTimeout(() => {
