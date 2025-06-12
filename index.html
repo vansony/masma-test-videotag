@@ -113,14 +113,14 @@
   let autoplayInterval;
   let isDragging = false;
   let dragStartX = 0;
-  let dragLastX = 0;
+  let accumulatedDx = 0;
 
   function getImageSrc(index) {
     return `${baseUrl}레이어 ${index + 1}.JPG`;
   }
 
   function updateFrame(index) {
-    current = (Math.round(index) + totalFrames) % totalFrames;
+    current = ((Math.round(index) % totalFrames) + totalFrames) % totalFrames;
     frame.src = getImageSrc(current);
   }
 
@@ -138,7 +138,8 @@
   // 스와이프 시작
   frame.addEventListener('touchstart', (e) => {
     isDragging = true;
-    dragStartX = dragLastX = e.touches[0].clientX;
+    dragStartX = e.touches[0].clientX;
+    accumulatedDx = 0;
     stopAutoplay();
   });
 
@@ -146,11 +147,16 @@
   frame.addEventListener('touchmove', (e) => {
     if (!isDragging) return;
     const currentX = e.touches[0].clientX;
-    const dx = currentX - dragLastX;
-    const sensitivity = 0.2;
-    current -= dx * sensitivity;
-    updateFrame(current);
-    dragLastX = currentX;
+    const dx = currentX - dragStartX;
+    dragStartX = currentX;
+    accumulatedDx += dx;
+
+    const sensitivity = 6; // 클수록 민감함
+    const frameDelta = Math.round(accumulatedDx / sensitivity);
+    if (frameDelta !== 0) {
+      updateFrame(current - frameDelta);
+      accumulatedDx = 0;
+    }
   });
 
   // 스와이프 끝나면 다시 자동 회전
@@ -168,6 +174,7 @@
 
 </body>
 </html>
+
 
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test01.jpg" />
 
