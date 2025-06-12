@@ -117,6 +117,8 @@
   const bagRatio = 1326 / 800;
   const containerHeight = containerWidth * bagRatio;
 
+  let spinnerInstance = null;
+
   $('#bag360').spritespin({
     source: imageUrls,
     width: containerWidth,
@@ -129,14 +131,21 @@
     plugins: ['360', 'drag'],
     dragAxis: 'x',
     touchSensitivity: 1.5,
+    onInit: function(e, data) {
+      spinnerInstance = data.api;
+    },
+    onDragStart: function(e, data) {
+      if (spinnerInstance) spinnerInstance.stopAnimation();
+    },
     onDragEnd: function(e, data) {
-      data.api.startAnimation(); // 손 뗐을 때 자동 회전 다시 시작
+      if (spinnerInstance) setTimeout(() => spinnerInstance.startAnimation(), 300);
     }
   });
 </script>
 
 </body>
 </html>
+
 
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test01.jpg" />
 
