@@ -70,18 +70,16 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>360도 가방 회전</title>
+  <title>360도 가방 회전 (Custom JS)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/spritespin@4.0.11/release/spritespin.js"></script>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       background: #fff;
       height: 100%;
+      overflow-x: hidden;
     }
-
     #bag-wrapper {
       width: 100vw;
       min-height: 100vh;
@@ -90,73 +88,101 @@
       align-items: center;
       background: #fff;
     }
-
     #bag360 {
       width: 100vw;
       aspect-ratio: 800 / 1326;
       max-height: 95vh;
-      background-color: transparent;
       touch-action: pan-y;
-      -ms-touch-action: pan-y;
+      -webkit-user-drag: none;
       user-select: none;
-      will-change: transform;
+      overflow: hidden;
+    }
+    #bag360 img {
+      width: 100%;
+      height: auto;
+      max-height: 95vh;
+      object-fit: contain;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-
 <div id="bag-wrapper">
-  <div id="bag360">로딩 중...</div>
+  <div id="bag360">
+    <img id="bagImage" src="" alt="360 가방">
+  </div>
 </div>
 
 <script>
-  const imageUrls = [];
-  for (let i = 1; i <= 37; i++) {
-    imageUrls.push(`https://enj161203.diskn.com/product/tshirts_test/test/레이어 ${i}.JPG`);
+  const totalFrames = 37;
+  const frameTime = 125;
+  const baseUrl = 'https://enj161203.diskn.com/product/tshirts_test/test/';
+  const imageEl = document.getElementById('bagImage');
+  let currentFrame = 0;
+  let autoTimer = null;
+  let isDragging = false;
+  let startX = 0;
+  let lastX = 0;
+  let frameOffset = 0;
+
+  function getImageSrc(index) {
+    return `${baseUrl}레이어 ${index + 1}.JPG`;
   }
 
-  const containerWidth = document.getElementById('bag360').clientWidth;
-  const bagRatio = 1326 / 800;
-  const containerHeight = containerWidth * bagRatio;
+  function updateFrame(index) {
+    currentFrame = (index + totalFrames) % totalFrames;
+    imageEl.src = getImageSrc(currentFrame);
+  }
 
-  let spinnerInstance = null;
-  let isDragging = false;
-  let autoRestartTimer = null;
+  function startAutoRotate() {
+    stopAutoRotate();
+    autoTimer = setInterval(() => {
+      updateFrame(currentFrame + 1);
+    }, frameTime);
+  }
 
-  $('#bag360').spritespin({
-    source: imageUrls,
-    width: containerWidth,
-    height: containerHeight,
-    sense: -1,
-    animate: true,
-    loop: true,
-    frameTime: 125,
-    responsive: false,
-    plugins: ['360', 'drag'],
-    dragAxis: 'x',
-    touchSensitivity: 1.5,
-    onInit: function(e, data) {
-      spinnerInstance = data.api;
-    },
-    onDragStart: function(e, data) {
+  function stopAutoRotate() {
+    if (autoTimer) clearInterval(autoTimer);
+    autoTimer = null;
+  }
+
+  function initDrag(el) {
+    el.addEventListener('touchstart', (e) => {
       isDragging = true;
-      if (spinnerInstance) spinnerInstance.stopAnimation();
-      if (autoRestartTimer) clearTimeout(autoRestartTimer);
-    },
-    onDragEnd: function(e, data) {
-      isDragging = false;
-      if (spinnerInstance) {
-        autoRestartTimer = setTimeout(() => {
-          if (!isDragging) {
-            spinnerInstance.stopAnimation();
-            spinnerInstance.startAnimation();
-          }
-        }, 500);
-      }
-    }
-  });
-</script>
+      stopAutoRotate();
+      startX = e.touches[0].clientX;
+      lastX = startX;
+    });
 
+    el.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const currentX = e.touches[0].clientX;
+      const dx = currentX - lastX;
+      const sensitivity = 0.25;
+      if (Math.abs(dx) > 1) {
+        frameOffset += dx;
+        const offsetFrames = Math.floor(frameOffset * sensitivity);
+        if (offsetFrames !== 0) {
+          updateFrame(currentFrame - offsetFrames);
+          frameOffset = 0;
+        }
+        lastX = currentX;
+      }
+    });
+
+    el.addEventListener('touchend', () => {
+      isDragging = false;
+      frameOffset = 0;
+      setTimeout(() => {
+        if (!isDragging) startAutoRotate();
+      }, 300);
+    });
+  }
+
+  updateFrame(0);
+  startAutoRotate();
+  initDrag(document.getElementById('bag360'));
+</script>
 </body>
 </html>
 
