@@ -138,7 +138,12 @@
       if (spinnerInstance) spinnerInstance.stopAnimation();
     },
     onDragEnd: function(e, data) {
-      if (spinnerInstance) setTimeout(() => spinnerInstance.startAnimation(), 300);
+      if (spinnerInstance) {
+        setTimeout(() => {
+          spinnerInstance.data.animate = true;
+          spinnerInstance.startAnimation();
+        }, 300);
+      }
     }
   });
 </script>
