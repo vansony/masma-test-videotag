@@ -121,7 +121,7 @@
   }
 
   function updateFrame(index) {
-    current = (index + totalFrames) % totalFrames;
+    current = (Math.round(index) + totalFrames) % totalFrames;
     frame.src = getImageSrc(current);
   }
 
@@ -151,7 +151,8 @@
     const currentX = e.touches[0].clientX;
     const dx = currentX - lastX;
     const sensitivity = 0.25; // 감도 조절 (작을수록 민감)
-    updateFrame(current - dx * sensitivity);
+    const targetFrame = Math.round(current - dx * sensitivity);
+    updateFrame(targetFrame);
     lastX = currentX;
   });
 
