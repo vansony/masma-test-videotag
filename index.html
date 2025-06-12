@@ -93,11 +93,11 @@
 
     #bag360 {
       width: 100vw;
-      aspect-ratio: 800 / 1326; /* 이미지 새 크기에 맞게 수정 */
+      aspect-ratio: 800 / 1326;
       max-height: 95vh;
       background-color: transparent;
-      touch-action: pan-y;  /* 세로 스크롤 허용 */
-      will-change: transform; /* 깜빡임 방지 */
+      touch-action: pan-y;
+      will-change: transform;
     }
   </style>
 </head>
@@ -114,7 +114,7 @@
   }
 
   const containerWidth = document.getElementById('bag360').clientWidth;
-  const bagRatio = 1326 / 800; // 이미지 비율에 맞게 수정
+  const bagRatio = 1326 / 800;
   const containerHeight = containerWidth * bagRatio;
 
   $('#bag360').spritespin({
@@ -127,15 +127,16 @@
     frameTime: 125,
     responsive: false,
     plugins: ['360', 'drag'],
-    dragAxis: 'x',         // 좌우 드래그만 허용
-    touchSensitivity: 1.5  // 감도 튜닝 가능
+    dragAxis: 'x',
+    touchSensitivity: 1.5,
+    onDragEnd: function(e, data) {
+      data.api.startAnimation(); // 손 뗐을 때 자동 회전 다시 시작
+    }
   });
 </script>
 
 </body>
 </html>
-
-
 
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test01.jpg" />
 
