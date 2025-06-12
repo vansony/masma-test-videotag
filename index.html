@@ -96,7 +96,7 @@
       aspect-ratio: 800 / 1326;
       max-height: 95vh;
       background-color: transparent;
-      touch-action: pan-y;
+      touch-action: manipulation;
       will-change: transform;
     }
   </style>
@@ -118,6 +118,8 @@
   const containerHeight = containerWidth * bagRatio;
 
   let spinnerInstance = null;
+  let isDragging = false;
+  let autoRestartTimer = null;
 
   $('#bag360').spritespin({
     source: imageUrls,
@@ -135,14 +137,19 @@
       spinnerInstance = data.api;
     },
     onDragStart: function(e, data) {
+      isDragging = true;
       if (spinnerInstance) spinnerInstance.stopAnimation();
+      if (autoRestartTimer) clearTimeout(autoRestartTimer);
     },
     onDragEnd: function(e, data) {
+      isDragging = false;
       if (spinnerInstance) {
-        setTimeout(() => {
-          spinnerInstance.data.animate = true;
-          spinnerInstance.startAnimation();
-        }, 300);
+        autoRestartTimer = setTimeout(() => {
+          if (!isDragging) {
+            spinnerInstance.data.animate = true;
+            spinnerInstance.startAnimation();
+          }
+        }, 500);
       }
     }
   });
@@ -150,7 +157,6 @@
 
 </body>
 </html>
-
 
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test01.jpg" />
 
