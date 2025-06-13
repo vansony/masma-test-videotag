@@ -84,7 +84,15 @@
   <style>
     html, body { margin:0; padding:0; background:#fff; overflow-y:auto; }
     #bag-wrapper { display:flex; justify-content:center; align-items:center; width:100vw; height:auto; }
-    canvas { width:100vw; height:auto; max-height:100vh; cursor:grab; touch-action: pan-y; display:block; }
+    canvas {
+      display: block;
+      max-width: 100vw;
+      max-height: 100vh;
+      width: auto;
+      height: auto;
+      cursor: grab;
+      touch-action: pan-y;
+    }
   </style>
 </head>
 <body>
@@ -101,6 +109,8 @@
     let lastTime = 0;
     let velocity = 0;
     let inertiaId = null;
+
+  
     for (let i = 1; i <= frameCount; i++) {
       const img = new Image();
       img.src = `https://enj161203.diskn.com/product/tshirts_test/test/레이어 ${i}.JPG`;
@@ -113,23 +123,29 @@
       };
       images.push(img);
     }
+
     function drawFrame(frame) {
-      const idx = ((frame % frameCount) + frameCount) % frameCount;
+      if (!Number.isFinite(frame)) return;
+      const idx = ((Math.round(frame) % frameCount) + frameCount) % frameCount;
+      if (!Number.isInteger(idx) || idx < 0 || idx >= frameCount) return;
       const img = images[idx];
-      if (!img.complete) return;
+      if (!img || !img.complete) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     }
+
     function startInertia() {
       cancelAnimationFrame(inertiaId);
       (function inertiaLoop() {
+        if (!Number.isFinite(velocity)) return;
         velocity *= 0.95;
         if (Math.abs(velocity) < 0.01) return;
-        currentFrame -= velocity * 3.5;
-        drawFrame(Math.round(currentFrame));
+        currentFrame = (currentFrame - velocity * 3.5) % frameCount;
+        drawFrame(currentFrame);
         inertiaId = requestAnimationFrame(inertiaLoop);
       })();
     }
+
     canvas.addEventListener('pointerdown', e => {
       isPointerDown = true;
       pointerId = e.pointerId;
@@ -139,17 +155,21 @@
       canvas.setPointerCapture(pointerId);
       canvas.style.cursor = 'grabbing';
     });
+
     canvas.addEventListener('pointermove', e => {
       if (!isPointerDown) return;
       const now = performance.now();
       const dx = e.clientX - lastX;
       const dt = now - lastTime;
-      velocity = dx / dt;
-      currentFrame -= dx * 0.2;
-      drawFrame(Math.round(currentFrame));
-      lastX = e.clientX;
-      lastTime = now;
+      if (dt > 0) {
+        velocity = dx / dt;
+        currentFrame = (currentFrame - dx * 0.2) % frameCount;
+        drawFrame(currentFrame);
+        lastX = e.clientX;
+        lastTime = now;
+      }
     }, { passive: true });
+
     function endInteraction(e) {
       if (isPointerDown) startInertia();
       isPointerDown = false;
@@ -162,6 +182,7 @@
     canvas.addEventListener('pointerup', endInteraction);
     canvas.addEventListener('pointercancel', endInteraction);
     canvas.addEventListener('lostpointercapture', endInteraction);
+
     window.addEventListener('wheel', () => {
       if (pointerId !== null) {
         canvas.releasePointerCapture(pointerId);
@@ -169,7 +190,8 @@
       }
       isPointerDown = false;
     }, { passive: true });
-    window.addEventListener('resize', () => drawFrame(Math.round(currentFrame)));
+
+    window.addEventListener('resize', () => drawFrame(currentFrame));
   </script>
 </body>
 </html>
