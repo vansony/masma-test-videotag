@@ -66,125 +66,6 @@
 
   <img src="https://gi.esmplus.com/pipe0801/MASMARULEZ/common/all-noti.jpg" />
   <img src="https://gi.esmplus.com/pipe0801/MASMARULEZ/common/hp-all-top.jpg" />
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>360도 가방 회전 (Custom JS)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: #fff;
-      height: 100%;
-      overflow-x: hidden;
-    }
-    #bag-wrapper {
-      width: 100vw;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #fff;
-    }
-    #bag360 {
-      width: 100vw;
-      aspect-ratio: 800 / 1326;
-      max-height: 95vh;
-      touch-action: pan-y;
-      -webkit-user-drag: none;
-      user-select: none;
-      overflow: hidden;
-    }
-    #bag360 img {
-      width: 100%;
-      height: auto;
-      max-height: 95vh;
-      object-fit: contain;
-      pointer-events: none;
-    }
-  </style>
-</head>
-<body>
-<div id="bag-wrapper">
-  <div id="bag360">
-    <img id="bagImage" src="" alt="360 가방">
-  </div>
-</div>
-
-<script>
-  const totalFrames = 37;
-  const frameTime = 125;
-  const baseUrl = 'https://enj161203.diskn.com/product/tshirts_test/test/';
-  const imageEl = document.getElementById('bagImage');
-  let currentFrame = 0;
-  let autoTimer = null;
-  let isDragging = false;
-  let startX = 0;
-  let lastX = 0;
-  let accumulatedDelta = 0;
-  const sensitivity = 0.15; // 낮을수록 더 민감하고 부드러움
-
-  function getImageSrc(index) {
-    return `${baseUrl}레이어 ${index + 1}.JPG`;
-  }
-
-  function updateFrame(index) {
-    currentFrame = (index + totalFrames) % totalFrames;
-    imageEl.src = getImageSrc(currentFrame);
-  }
-
-  function startAutoRotate() {
-    stopAutoRotate();
-    autoTimer = setInterval(() => {
-      updateFrame(currentFrame + 1);
-    }, frameTime);
-  }
-
-  function stopAutoRotate() {
-    if (autoTimer) clearInterval(autoTimer);
-    autoTimer = null;
-  }
-
-  function initDrag(el) {
-    el.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      stopAutoRotate();
-      startX = e.touches[0].clientX;
-      lastX = startX;
-      accumulatedDelta = 0;
-    });
-
-    el.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const currentX = e.touches[0].clientX;
-      const dx = currentX - lastX;
-      accumulatedDelta += dx;
-      const frameChange = Math.floor(accumulatedDelta * sensitivity);
-      if (frameChange !== 0) {
-        updateFrame(currentFrame - frameChange);
-        accumulatedDelta -= frameChange / sensitivity; // 남은 델타 유지
-      }
-      lastX = currentX;
-    });
-
-    el.addEventListener('touchend', () => {
-      isDragging = false;
-      accumulatedDelta = 0;
-      setTimeout(() => {
-        if (!isDragging) startAutoRotate();
-      }, 300);
-    });
-  }
-
-  updateFrame(0);
-  startAutoRotate();
-  initDrag(document.getElementById('bag360'));
-</script>
-</body>
-</html>
-
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test01.jpg" />
 
 <div class="video-box">
@@ -194,6 +75,104 @@
 </div>
 
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test02.jpg" />
+  <!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swipe360</title>
+  <style>
+    html, body { margin:0; padding:0; background:#fff; overflow-y:auto; }
+    #bag-wrapper { display:flex; justify-content:center; align-items:center; width:100vw; height:auto; }
+    canvas { width:100vw; height:auto; max-height:100vh; cursor:grab; touch-action: pan-y; display:block; }
+  </style>
+</head>
+<body>
+  <div id="bag-wrapper"><canvas id="bagCanvas"></canvas></div>
+  <script>
+    const frameCount = 37;
+    const images = [];
+    const canvas = document.getElementById('bagCanvas');
+    const ctx = canvas.getContext('2d');
+    let currentFrame = 0;
+    let isPointerDown = false;
+    let pointerId = null;
+    let lastX = 0;
+    let lastTime = 0;
+    let velocity = 0;
+    let inertiaId = null;
+    for (let i = 1; i <= frameCount; i++) {
+      const img = new Image();
+      img.src = `https://enj161203.diskn.com/product/tshirts_test/test/레이어 ${i}.JPG`;
+      img.onload = () => {
+        if (i === 1) {
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          drawFrame(0);
+        }
+      };
+      images.push(img);
+    }
+    function drawFrame(frame) {
+      const idx = ((frame % frameCount) + frameCount) % frameCount;
+      const img = images[idx];
+      if (!img.complete) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    }
+    function startInertia() {
+      cancelAnimationFrame(inertiaId);
+      (function inertiaLoop() {
+        velocity *= 0.95;
+        if (Math.abs(velocity) < 0.01) return;
+        currentFrame -= velocity * 3.5;
+        drawFrame(Math.round(currentFrame));
+        inertiaId = requestAnimationFrame(inertiaLoop);
+      })();
+    }
+    canvas.addEventListener('pointerdown', e => {
+      isPointerDown = true;
+      pointerId = e.pointerId;
+      lastX = e.clientX;
+      lastTime = performance.now();
+      cancelAnimationFrame(inertiaId);
+      canvas.setPointerCapture(pointerId);
+      canvas.style.cursor = 'grabbing';
+    });
+    canvas.addEventListener('pointermove', e => {
+      if (!isPointerDown) return;
+      const now = performance.now();
+      const dx = e.clientX - lastX;
+      const dt = now - lastTime;
+      velocity = dx / dt;
+      currentFrame -= dx * 0.2;
+      drawFrame(Math.round(currentFrame));
+      lastX = e.clientX;
+      lastTime = now;
+    }, { passive: true });
+    function endInteraction(e) {
+      if (isPointerDown) startInertia();
+      isPointerDown = false;
+      if (pointerId !== null) {
+        canvas.releasePointerCapture(pointerId);
+        pointerId = null;
+      }
+      canvas.style.cursor = 'grab';
+    }
+    canvas.addEventListener('pointerup', endInteraction);
+    canvas.addEventListener('pointercancel', endInteraction);
+    canvas.addEventListener('lostpointercapture', endInteraction);
+    window.addEventListener('wheel', () => {
+      if (pointerId !== null) {
+        canvas.releasePointerCapture(pointerId);
+        pointerId = null;
+      }
+      isPointerDown = false;
+    }, { passive: true });
+    window.addEventListener('resize', () => drawFrame(Math.round(currentFrame)));
+  </script>
+</body>
+</html>
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test03.jpg" />
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test04.jpg" />
   <img src="https://enj161203.diskn.com/product/tshirts_test/tshirts_test05.jpg" />
